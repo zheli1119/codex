@@ -69,20 +69,13 @@ impl Shell {
                 // turn it into a PowerShell command.
                 let first = command.first().map(String::as_str);
                 if first != Some(ps.exe.as_str()) {
-                    // TODO (CODEX_2900): Handle escaping newlines.
-                    if command.iter().any(|a| a.contains('\n') || a.contains('\r')) {
-                        return Some(command);
-                    }
-
-                    let joined = shlex::try_join(command.iter().map(|s| s.as_str())).ok();
-                    return joined.map(|arg| {
-                        vec![
-                            ps.exe.clone(),
-                            "-NoProfile".to_string(),
-                            "-Command".to_string(),
-                            arg,
-                        ]
-                    });
+                    let joined = join_as_powershell_script(&command);
+                    return Some(vec![
+                        ps.exe.clone(),
+                        "-NoProfile".to_string(),
+                        "-Command".to_string(),
+                        joined,
+                    ]);
                 }
 
                 // Model generated a PowerShell command. Run it.
@@ -114,6 +107,23 @@ fn strip_bash_lc(command: &Vec<String>) -> Option<String> {
         }
         _ => None,
     }
+}
+
+fn join_as_powershell_script(command: &[String]) -> String {
+    command
+        .iter()
+        .map(|arg| {
+            if arg
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || "_-:/\\.$".contains(c))
+            {
+                arg.clone()
+            } else {
+                format!("'{}'", arg.replace('\'', "''"))
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 #[cfg(target_os = "macos")]
@@ -402,7 +412,6 @@ mod tests_windows {
                 vec!["pwsh.exe", "-NoProfile", "-Command", "echo hello"],
             ),
             (
-                // TODO (CODEX_2900): Handle escaping newlines for powershell invocation.
                 Shell::PowerShell(PowerShellConfig {
                     exe: "powershell.exe".to_string(),
                     bash_exe_fallback: Some(PathBuf::from("bash.exe")),
@@ -413,9 +422,36 @@ mod tests_windows {
                     "*** Begin Patch\n*** Update File: C:\\Users\\person\\destination_file.txt\n-original content\n+modified content\n*** End Patch",
                 ],
                 vec![
-                    "codex-mcp-server.exe",
-                    "--codex-run-as-apply-patch",
-                    "*** Begin Patch\n*** Update File: C:\\Users\\person\\destination_file.txt\n-original content\n+modified content\n*** End Patch",
+                    "powershell.exe",
+                    "-NoProfile",
+                    "-Command",
+                    "codex-mcp-server.exe --codex-run-as-apply-patch '*** Begin Patch\n*** Update File: C:\\Users\\person\\destination_file.txt\n-original content\n+modified content\n*** End Patch'",
+                ],
+            ),
+            (
+                Shell::PowerShell(PowerShellConfig {
+                    exe: "pwsh.exe".to_string(),
+                    bash_exe_fallback: None,
+                }),
+                vec!["pwsh", "-Command", "echo $Env:FOO"],
+                vec![
+                    "pwsh.exe",
+                    "-NoProfile",
+                    "-Command",
+                    "pwsh -Command 'echo $Env:FOO'",
+                ],
+            ),
+            (
+                Shell::PowerShell(PowerShellConfig {
+                    exe: "pwsh.exe".to_string(),
+                    bash_exe_fallback: None,
+                }),
+                vec!["Write-Host", "line1\nline2"],
+                vec![
+                    "pwsh.exe",
+                    "-NoProfile",
+                    "-Command",
+                    "Write-Host 'line1\nline2'",
                 ],
             ),
         ];

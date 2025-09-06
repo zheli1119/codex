@@ -1,0 +1,8 @@
+---
+source: tui/src/history_cell.rs
+expression: rendered
+---
+• 已探索
+  └ 搜索 shimmer_spans
+    读取 shimmer.rs
+    读取 status_indicator_widget.rs

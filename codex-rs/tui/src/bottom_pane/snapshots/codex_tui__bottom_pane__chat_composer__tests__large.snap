@@ -1,0 +1,14 @@
+---
+source: tui/src/bottom_pane/chat_composer.rs
+expression: terminal.backend()
+---
+"▌[粘贴内容 1005 字符]                                                                               " Hidden by multi-width symbols: [(3, "o"), (5, "t"), (7, " "), (9, " "), (17, " "), (19, " ")]
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+" ⏎ 发送   ⌃J 换行   ⌃T 对话记录   ⌃C 退出                                                           " Hidden by multi-width symbols: [(4, " "), (6, " "), (14, " "), (16, " "), (24, " "), (26, " "), (28, " "), (30, " "), (38, " "), (40, " ")]

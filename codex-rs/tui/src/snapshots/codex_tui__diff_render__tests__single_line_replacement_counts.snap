@@ -1,0 +1,12 @@
+---
+source: tui/src/diff_render.rs
+expression: terminal.backend()
+---
+"• 拟议更改 README.md (+1 -1)                                                    " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " "), (9, " ")]
+"    1     -# Codex CLI (Rust Implementation)                                    "
+"    1     +# Codex CLI (Rust Implementation) banana                             "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "

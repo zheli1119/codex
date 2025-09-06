@@ -1,0 +1,6 @@
+---
+source: tui/src/chatwidget/tests.rs
+expression: terminal.backend()
+---
+" Thinking (0s • Esc 中断)               " Hidden by multi-width symbols: [(21, " "), (23, " ")]
+"▌ Ask Codex to do anything              "

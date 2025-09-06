@@ -1,0 +1,6 @@
+---
+source: tui/src/status_indicator_widget.rs
+expression: terminal.backend()
+---
+" 进行中 (0s • Esc 中" Hidden by multi-width symbols: [(2, " "), (4, " "), (6, " "), (19, " ")]
+"                    "

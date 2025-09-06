@@ -1,0 +1,13 @@
+---
+source: tui/src/chatwidget/tests.rs
+expression: terminal.backend()
+---
+"                                                                                "
+"The model wants to apply changes                                                "
+"                                                                                "
+"This will grant write access to /tmp for the remainder of this session.         "
+"                                                                                "
+"▌应用更改？                                                                     " Hidden by multi-width symbols: [(2, " "), (4, " "), (6, " "), (8, " "), (10, " ")]
+"▌ 是   否，提供反馈                                                             " Hidden by multi-width symbols: [(3, " "), (8, " "), (10, " "), (12, " "), (14, " "), (16, " "), (18, " ")]
+"▌ 批准并应用更改                                                                " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " "), (9, " "), (11, " "), (13, " "), (15, " ")]
+"                                                                                "

@@ -1,0 +1,7 @@
+---
+source: tui/src/chatwidget/tests.rs
+expression: active_blob(&chat)
+---
+⠋ 探索中
+  └ 列出 ls -la
+    读取 foo.txt

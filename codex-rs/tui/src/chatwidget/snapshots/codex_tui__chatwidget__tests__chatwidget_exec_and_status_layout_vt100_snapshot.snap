@@ -1,0 +1,15 @@
+---
+source: tui/src/chatwidget/tests.rs
+expression: visual
+---
+> I’m going to search the repo for where “Change Approved” is rendered to update
+  that view.
+
+• 已 探 索
+  └ 搜 索  Change Approved
+    读 取  diff_render.rs
+
+ Investigating rendering code (0s • Esc 中 断 )
+
+▌Summarize recent commits
+ ⏎ 发 送    ⌃J 换 行    ⌃T 对 话 记 录    ⌃C 退 出

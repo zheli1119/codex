@@ -1,0 +1,14 @@
+---
+source: tui/src/bottom_pane/chat_composer.rs
+expression: terminal.backend()
+---
+"▌ Ask Codex to do anything                                                                          "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+"▌                                                                                                   "
+" ⏎ 发送   ⌃J 换行   ⌃T 对话记录   ⌃C 退出                                                           " Hidden by multi-width symbols: [(4, " "), (6, " "), (14, " "), (16, " "), (24, " "), (26, " "), (28, " "), (30, " "), (38, " "), (40, " ")]

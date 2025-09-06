@@ -1,0 +1,16 @@
+---
+source: tui/src/diff_render.rs
+expression: terminal.backend()
+---
+"• 更改已批准 example.txt (+1 -1)                                                " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " "), (9, " "), (11, " ")]
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "

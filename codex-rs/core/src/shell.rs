@@ -126,6 +126,80 @@ fn strip_bash_lc(command: &Vec<String>) -> Option<String> {
     }
 }
 
+/// Determines if the tokens require a shell (PowerShell) to interpret
+/// operators like pipelines, logical chaining, redirections, or grouping.
+fn needs_powershell_shell(tokens: &[String]) -> bool {
+    tokens.iter().any(|t| is_powershell_operator(t))
+}
+
+fn is_powershell_operator(token: &str) -> bool {
+    matches!(
+        token,
+        "|" | "||"
+            | "&&"
+            | ";"
+            | "<"
+            | ">"
+            | ">>"
+            | "1>"
+            | "1>>"
+            | "2>"
+            | "2>>"
+            | "2>&1"
+            | "1>&2"
+            | "("
+            | ")"
+    )
+}
+
+/// Quote a single token for safe use in a PowerShell script. Uses single-quoted
+/// strings and doubles any single quotes inside.
+fn ps_quote(token: &str) -> String {
+    // In PowerShell, single-quoted strings are literal; to escape a single quote,
+    // double it.
+    let mut s = String::with_capacity(token.len() + 2);
+    s.push('\'');
+    for ch in token.chars() {
+        if ch == '\'' {
+            s.push('\'');
+            s.push('\'');
+        } else {
+            s.push(ch);
+        }
+    }
+    s.push('\'');
+    s
+}
+
+/// Builds a PowerShell `-Command` script that executes the provided tokens
+/// faithfully, preserving operators and quoting arguments/paths.
+fn build_powershell_command_script(tokens: &[String]) -> String {
+    // We try to reconstruct commands separated by operators and invoke commands via
+    // the call operator `&` so that paths and bare words are executed reliably.
+    let mut parts: Vec<String> = Vec::with_capacity(tokens.len() * 2);
+    let mut expect_command = true;
+
+    for tok in tokens {
+        if is_powershell_operator(tok) {
+            parts.push(tok.clone());
+            // After pipeline/logical/grouping operators, expect the next token to be a command.
+            expect_command = matches!(tok.as_str(), "|" | "||" | "&&" | ";" | "(");
+            continue;
+        }
+
+        if expect_command {
+            parts.push("&".to_string());
+            parts.push(ps_quote(tok));
+            expect_command = false;
+        } else {
+            parts.push(ps_quote(tok));
+        }
+    }
+
+    // Join with spaces; quoting ensures literal interpretation where needed.
+    parts.join(" ")
+}
+
 #[cfg(unix)]
 fn detect_default_user_shell() -> Shell {
     use libc::getpwuid;

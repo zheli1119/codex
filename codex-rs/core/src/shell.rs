@@ -243,40 +243,49 @@ pub async fn default_user_shell() -> Shell {
 pub async fn default_user_shell() -> Shell {
     use tokio::process::Command;
 
-    // Prefer PowerShell 7+ (`pwsh`) if available, otherwise fall back to Windows PowerShell.
-    let has_pwsh = Command::new("pwsh")
-        .arg("-NoLogo")
-        .arg("-NoProfile")
-        .arg("-Command")
-        .arg("$PSVersionTable.PSVersion.Major")
-        .output()
-        .await
-        .map(|o| o.status.success())
-        .unwrap_or(false);
-    let bash_exe = if Command::new("bash.exe")
-        .arg("--version")
-        .output()
-        .await
-        .ok()
-        .map(|o| o.status.success())
-        .unwrap_or(false)
+    // Prefer pwsh.exe (PowerShell 7+) with the highest weight.
+    // Only fall back to Windows PowerShell if pwsh is not available.
+    // Detect optional bash fallback (e.g., Git Bash) to support `bash -lc` patterns.
+    let bash_exe = if Command::new("bash.exe").arg("--version")
+        .output().await.ok().map(|o| o.status.success()).unwrap_or(false)
     {
         which::which("bash.exe").ok()
+    } else if let Ok(path) = which::which(r"C:\Program Files\Git\bin\bash.exe") {
+        Some(path)
     } else {
         None
     };
 
-    if has_pwsh {
-        Shell::PowerShell(PowerShellConfig {
+    // Helper: probe a PowerShell flavor by asking for major version.
+    async fn probe_ps(exe: &str) -> bool {
+        Command::new(exe)
+            .arg("-NoLogo").arg("-NoProfile")
+            .arg("-Command").arg("$PSVersionTable.PSVersion.Major")
+            .output().await
+            .map(|o| o.status.success()).unwrap_or(false)
+    }
+
+    // 1) Highest priority: pwsh.exe
+    if probe_ps("pwsh").await || probe_ps("pwsh.exe").await {
+        return Shell::PowerShell(PowerShellConfig {
             exe: "pwsh.exe".to_string(),
             bash_exe_fallback: bash_exe,
-        })
-    } else {
-        Shell::PowerShell(PowerShellConfig {
+        });
+    }
+
+    // 2) Fallback: Windows PowerShell
+    if probe_ps("powershell").await || probe_ps("powershell.exe").await {
+        return Shell::PowerShell(PowerShellConfig {
             exe: "powershell.exe".to_string(),
             bash_exe_fallback: bash_exe,
-        })
+        });
     }
+
+    // 3) Final fallback: choose pwsh.exe to encourage modern path (errors will guide setup).
+    Shell::PowerShell(PowerShellConfig {
+        exe: "pwsh.exe".to_string(),
+        bash_exe_fallback: bash_exe,
+    })
 }
 
 #[cfg(all(not(target_os = "windows"), not(unix)))]
